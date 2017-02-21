@@ -4,25 +4,12 @@ const request = require('supertest');
 const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
-const todos = [{
-    _id: new ObjectID(),
-    text: 'First todo from test'
-}, {
-    _id: new ObjectID(),
-    text: 'Second todo from test',
-    completed: false,
-    completedAt: 123
-}]
-
-console.log(todos[0]._id)
 
 //Clean out the database before each test
-beforeEach((done) => {
-    Todo.remove({}).then(() => {
-        return Todo.insertMany(todos)
-    }).then(() => done());
-})
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe('POST /todos', () => {
     it('should create new todo', (done) => {
