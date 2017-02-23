@@ -3,16 +3,6 @@ const {Todo} = require('../../models/todo');
 const {User} = require('../../models/user');
 const jwt = require('jsonwebtoken');
 
-const todos = [{
-    _id: new ObjectID(),
-    text: 'First todo from test'
-}, {
-    _id: new ObjectID(),
-    text: 'Second todo from test',
-    completed: false,
-    completedAt: 123
-}]
-
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 const users = [{
@@ -34,11 +24,17 @@ const users = [{
     password: 'userTwoPass',
 }]
 
-const populateTodos = (done) => {
-    Todo.remove({}).then(() => {
-        return Todo.insertMany(todos)
-    }).then(() => done());
-}
+const todos = [{
+    _id: new ObjectID(),
+    text: 'First todo from test',
+    _creator: userOneId
+}, {
+    _id: new ObjectID(),
+    text: 'Second todo from test',
+    completed: false,
+    completedAt: 123,
+    _creator: userTwoId
+}]
 
 const populateUsers = (done) => {
     User.remove({}).then(() => {
@@ -47,6 +43,12 @@ const populateUsers = (done) => {
 
         //Takes in two promises, not going to call until all the specified promises are resolved
         return Promise.all([userOne, userTwo])
+    }).then(() => done());
+}
+
+const populateTodos = (done) => {
+    Todo.remove({}).then(() => {
+        return Todo.insertMany(todos)
     }).then(() => done());
 }
 
