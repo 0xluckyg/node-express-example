@@ -14,7 +14,7 @@ let authenticate = (req, res, next) => {
         //call next to move on
         next();
     }).catch((err) => {
-        res.status(401).send();
+        return res.status(401).send();
     });
 }
 

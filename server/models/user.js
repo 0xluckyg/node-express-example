@@ -67,6 +67,16 @@ UserSchema.methods.generateAuthToken = function() {
     })
 }
 
+UserSchema.methods.removeToken = function(token) {
+    let user = this;
+
+    return user.update({
+        $pull: {
+            tokens: { token }
+        }
+    })
+}
+
 //Statics turns into a model method instead of an instance method
 UserSchema.statics.findByToken = function(token) {
     let User = this;
@@ -82,6 +92,25 @@ UserSchema.statics.findByToken = function(token) {
         _id: decoded._id,
         'tokens.token': token,
         'tokens.access': 'auth'
+    })
+}
+
+UserSchema.statics.findByCredentials = function(email, password) {
+    let User = this;
+
+    return User.findOne({email}).then((user) => {
+        if (!user) {
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(password, user.password, (err, res) => {
+                if (res) {
+                    resolve(user);
+                } else {
+                    reject();
+                }
+            })
+        })
     })
 }
 

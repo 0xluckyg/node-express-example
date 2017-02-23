@@ -20,7 +20,6 @@ app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
     });
-    console.log(req.body);
 
     todo.save().then((doc) => {
         //send the doc back
@@ -43,12 +42,12 @@ app.get('/todos', (req, res) => {
 app.get('/todos/:id', (req, res) => {
     const id = req.params.id;
     if (!ObjectID.isValid(id)) {
-        res.status(404).send();
+        return res.status(404).send();
     }
     Todo.findById(id).then((todo) => {
         if (!todo) {
             console.log('TODO:',todo);
-            res.status(404).send();
+            return res.status(404).send();
         }
         res.send({todo});
     }).catch((err) => {
@@ -62,11 +61,11 @@ app.get('/todos/:id', (req, res) => {
 app.delete('/todos/:id', (req, res) => {
     const id = req.params.id;
     if (!ObjectID.isValid(id)) {
-        res.status(404).send();
+        return res.status(404).send();
     }
     Todo.findByIdAndRemove(id).then((todo) => {
         if (!todo) {
-            res.status(404).send();
+            return res.status(404).send();
         }
         res.send({todo});
     }, (err) => {
@@ -78,7 +77,7 @@ app.patch('/todos/:id', (req, res) => {
     const id = req.params.id;
     var body = _.pick(req.body, ['text', 'completed']);
     if (!ObjectID.isValid(id)) {
-        res.status(404).send();
+        return res.status(404).send();
     }
 
     if (_.isBoolean(body.completed) && body.completed) {
@@ -99,9 +98,10 @@ app.patch('/todos/:id', (req, res) => {
     })
 })
 
+//SIGNUP This is for signup only, because logging in is not accepted due to duplicate email.
 app.post('/users', (req, res) => {
     let body = _.pick(req.body, ['name', 'email', 'password']);
-    var user = new User(body);
+    let user = new User(body);
 
     user.save().then(() => {
         return user.generateAuthToken();
@@ -112,9 +112,30 @@ app.post('/users', (req, res) => {
     })
 });
 
-//call middleware
+//LOGIN, to generate another x-auth token
+app.post('/users/login', (req, res) => {
+    let body = _.pick(req.body, ['email', 'password'])
+    User.findByCredentials(body.email, body.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+    }).catch((err) => {
+        res.status(400).send();
+    })
+})
+
+//GET USER, call middleware
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
+})
+
+//LOGOUT, deleting user token
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    })
 })
 
 app.listen(port, () => {
