@@ -14,14 +14,21 @@ const users = [{
         access: 'auth',
         token: jwt.sign({
             _id: userOneId,
-            acces: 'auth',
-        }, 'secret_salt').toString()
+            access: 'auth',
+        }, process.env.JWT_SECRET).toString()
     }]
 }, {
     name: 'User2',
     _id: userTwoId,
     email: 'user2@gmail.com',
     password: 'userTwoPass',
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({
+            _id: userTwoId,
+            access: 'auth',
+        }, process.env.JWT_SECRET).toString()
+    }]
 }]
 
 const todos = [{
