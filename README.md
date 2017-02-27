@@ -9,7 +9,7 @@ nodeJS
 
 Useful dependencies
 	bcryptjs
-	  encrypting password
+		encrypting password
 	jsonwebtoken
 		making user tokens
 	bluebird
