@@ -5,7 +5,7 @@ This repository is for my own reference.
 
 # Mongo Notes
 
-nodeJS
+nodeJS 
 
 Useful dependencies
 	bcryptjs
